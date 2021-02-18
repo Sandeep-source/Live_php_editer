@@ -382,7 +382,7 @@ public class PHPServer extends Application{
          	return res.get();
 
          });
-        engine.load("https://www.google.com");
+       
         txt=new TextArea();
         web.setPrefWidth(sc.getWidth()/2);
         web.prefWidthProperty().bind(sc.widthProperty());
