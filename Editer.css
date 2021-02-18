@@ -1,0 +1,73 @@
+.menu-bar{
+	-fx-background-color:#999999; 
+
+}
+.menu{
+	-fx-background-color:#999999; 
+
+}
+.menu-item{
+	-fx-background-color:#999999; 
+
+}
+.menu-item:hover{
+	-fx-background-color:#777777; 
+
+}
+.menu:hover{
+	-fx-background-color:#777777; 
+
+}
+.tab-pane .tab{
+	-fx-background-color:#999999; 
+	
+}
+.tab-pane .tab .tab-label{
+	 -fx-font-size: 12px;
+	 -fx-alignment: CENTER;
+	-fx-text-fill:#ffffff;
+}
+.tab-pane .tab:selected .tab-label{
+	 -fx-font-size:14px;
+	 -fx-alignment: CENTER;
+	-fx-text-fill:#777777;
+}
+.tab-pane .tab:selected{
+	-fx-background-color:#ffffff; 
+
+	
+}
+.web-view{
+	-fx-min-width:0;
+	-fx-min-height:0;
+	
+}
+
+.tab-pane .tab .tab-header{
+	 -fx-background-color:red;
+}
+.tab-pane
+{
+    -fx-tab-min-width:90px;
+   
+}
+.add{
+	-fx-tab-min-width:30px;
+}
+.tab{
+    -fx-background-insets: 0 1 0 1,0,0;
+}
+
+.button{
+	-fx-padding:0px;
+	-fx-width:3px;
+
+}
+.button:hover{
+-fx-background-color:black;
+	
+}
+.text-area{
+-fx-background-color:#999999; 
+-fx-font-size:15Px;
+}
