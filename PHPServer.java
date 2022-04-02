@@ -13,7 +13,7 @@ import javafx.beans.value.*;
 import java.util.*;
 import javafx.event.*;
 import javafx.geometry.Side;
-
+  
 import javafx.beans.property.*;
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -92,7 +92,7 @@ public class PHPServer extends Application{
             tb.txt.textProperty().addListener( new ChangeListener<String>(){
             @Override
             public void changed(ObservableValue<? extends String> val,String o,String n){
-              if(tb.counter%4==0){
+            new Thread(()->{
             	if(tb.opend!=null)
             	temp=new File(tb.opend.getAbsolutePath()+".temp.php");
                 else
@@ -132,23 +132,26 @@ public class PHPServer extends Application{
 			            	}
 			            if(temphtml!=null){
 			            		temphtml.deleteOnExit();
-				    		try(FileOutputStream htmlout=new FileOutputStream(temphtml)){
-				    			for(char a: html.toCharArray()){
-				    				htmlout.write(a);
+				    		try(PrintWriter htmlout=new PrintWriter(new FileOutputStream(temphtml))){
+				    			String[] str=html.split("\n");
+				    			for(int i=0;i<str.length;i++){
+				    				htmlout.println(str[i]);
 				    			}
 				    		}
-	    			tb.engine.load(temphtml.toURI().toString());
+				    Platform.runLater(()->{
+				    	tb.engine.load(temphtml.toURI().toString());
+				    });
+	    			
 	    		}
 	    		}catch(Exception ex){
 
 	    		}
 	    	}
-            
-          }else{
-          	tb.counter=(tb.counter+1)%2000;
+
+            }).start();
+          
           }
-      }
-         
+ 
          });
 	   			
 	   			tab_pane.getTabs().add(tb);
@@ -208,7 +211,7 @@ public class PHPServer extends Application{
             curtab.txt.textProperty().addListener( new ChangeListener<String>(){
             @Override
             public void changed(ObservableValue<? extends String> val,String o,String n){
-              if(curtab.counter%4==0){
+              if(curtab.counter%10==0){
             	if(curtab.opend!=null)
             	temp=new File(curtab.opend.getAbsolutePath()+".temp.php");
                 else
@@ -248,12 +251,15 @@ public class PHPServer extends Application{
 			            	}
 			            	if(temphtml!=null){
 			            		temphtml.deleteOnExit();
-				    		try(FileOutputStream htmlout=new FileOutputStream(temphtml)){
-				    			for(char a: html.toCharArray()){
-				    				htmlout.write(a);
+				    		try(PrintWriter htmlout=new PrintWriter(new FileOutputStream(temphtml))){
+				    			String[] str=html.split("\n");
+				    			for(int i=0;i<str.length;i++){
+				    				htmlout.println(str[i]);
 				    			}
 				    		}
-	    			curtab.engine.load(temphtml.toURI().toString());
+	    			Platform.runLater(()->{
+				     curtab.engine.load(temphtml.toURI().toString());
+				    });
 	    		}
 	    		}catch(Exception ex){
 
