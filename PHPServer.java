@@ -234,7 +234,7 @@ public class PHPServer extends Application{
 	   	public void changed(ObservableValue<? extends Tab> val,Tab old, Tab newval){
 	   		Tabbber tmpTab=(Tabbber)newval;
 	   		//Tab clicked to open new tab
-	   		if(tmpTab.TYPE==Tabbber.TYPE_OPEN_NEW){
+	   		if(tmpTab.TYPE==Tabbber.TAB_OPEN_NEW){
 
 	   			//add title to new tab
 	   			curtab=new Tabbber("untitled");
@@ -399,9 +399,9 @@ public class PHPServer extends Application{
 
    //Custom tab class 
 	private class Tabbber extends Tab{
-		final int  TAB_REGULAR=2;
+		static final int  TAB_REGULAR=2;
 		int TYPE=TAB_REGULAR;
-		final int TAB_OPEN_NEW=1;
+		static final int TAB_OPEN_NEW=1;
 		
 		HBox topcon;
 		VBox webcon;
