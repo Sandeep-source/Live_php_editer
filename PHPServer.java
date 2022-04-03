@@ -20,13 +20,26 @@ import javafx.collections.*;
 
 
 public class PHPServer extends Application{
+
+    //File to store php code temporarely
 	File temp;
+
+	//file to store html code temporarely
 	File temphtml;
+
+	//initial zoom levels
 	double zoom=1;
+
+	//Current active tab
 	Tabbber curtab;
-	 Scene sc;
+
+	//Root scene instance
+	Scene sc;
+
+	//Tabpane to contain all tabs
 	TabPane tab_pane;
 	
+	//TODO
 	String query;
 	double x;
 	double y;
@@ -39,78 +52,129 @@ public class PHPServer extends Application{
 
 	}
 	public void start(Stage mstg){
+		//set title
 		mstg.setTitle("PHP Editer");
+
+		//set icon 
 		mstg.getIcons().add(new Image("phpe2.png"));
+
+		//Create root layout pane
 		BorderPane root=new BorderPane();
+
+		//initialize tabpane
 		tab_pane=new TabPane();
+        
+        //Set alignment
 		tab_pane.setSide(Side.LEFT);
+
+		//initialize root Scene
 	    sc=new Scene(root,800,700);
+
+	    //add Style sheet
 	    sc.getStylesheets().add("Editer.css");
 		
+		//Menubar for actions can be taken on tab
 		MenuBar mb=new MenuBar();
                
 		//mstg.getIcons().add(new Image("note.png"));
+		//File menu for primary action 
 		Menu file=new Menu("File");
-              
+
+
+        //Menu item for file menu      
 		MenuItem opn=new MenuItem("Open");
 		MenuItem save=new MenuItem("Save");
 		MenuItem save_as=new MenuItem("Save as");
 		MenuItem exit=new MenuItem("Exit");
+
+		//Sortcuut keys for file menu 
 		save.setAccelerator(KeyCombination.keyCombination("CTRL+S"));
 		save_as.setAccelerator(KeyCombination.keyCombination("CTRL+SHIFT+S"));
 		opn.setAccelerator(KeyCombination.keyCombination("CTRL+O"));
 		exit.setAccelerator(KeyCombination.keyCombination("CTRL+E"));
+
+		//View menu for view related customization
 	    Menu edit=new Menu("View");
+
+	    //Menu item for view Menu
 	    MenuItem zoom_in=new MenuItem("zoom in");
 	    MenuItem zoom_out=new MenuItem("zoom out");
+
+	    //Shortcut keys for view menu item
 	    zoom_in.setAccelerator(KeyCombination.keyCombination("CTRL+P"));
 	    zoom_out.setAccelerator(KeyCombination.keyCombination("CTRL+M"));
+
+	    //Add view menu items to View Menu  
 	    edit.getItems().addAll(zoom_in,zoom_out);
+
+	    //Add file menu items
 		file. getItems().addAll(opn,save,save_as,exit);
+
+		//Create help menu
 		Menu hp=new Menu("Help");
+
+		//add all menus to menubar
 		mb.getMenus().addAll(file,edit,hp);
+
+		//Add menubar to the of root layout
 		root.setTop(mb);
+
+		//Add tabpane to the center of root layout 
 		root.setCenter(tab_pane);
 		
-		
+		//Create initial tab object of custom tab class (Tabbbler)
 		Tabbber one=new Tabbber("main");
+
+		//Tab to create new tabs 😅
 		Tabbber add=new Tabbber("+");
+		add.TYPE=Tabbber.TAB_OPEN_NEW;
 		add.getStyleClass().add("add");
 		tab_pane.getTabs().addAll(add,one);
 		tab_pane.getSelectionModel().select(one);
 		curtab=one;
-	    
-	   tab_pane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>(){
-	   	public void changed(ObservableValue<? extends Tab> val,Tab old, Tab newval){
-	   		if(newval.getText()=="+"){
-	   			Tabbber tb=new Tabbber("untitled");
-	   			curtab=tb;
-	   			tb.txtCon.addEventHandler(MouseEvent.MOUSE_DRAGGED,(event)->{
-          x=event.getScreenX();
-          y=event.getScreenY();
-	    });
-            tb.txt.textProperty().addListener( new ChangeListener<String>(){
+
+
+		//Change listener-> listen for changes in text inside text area and make preview of text available in web view
+
+		ChangeListener changeListener= new ChangeListener<String>(){
             @Override
             public void changed(ObservableValue<? extends String> val,String o,String n){
+
+            //New Thread to reduce work load on main thread
             new Thread(()->{
-            	if(tb.opend!=null)
-            	temp=new File(tb.opend.getAbsolutePath()+".temp.php");
+
+            	//if in the current tab a file is opened then open temporary file for php code with the name of file in same location
+            	if(curtab.opend!=null)
+            	 temp=new File(curtab.opend.getAbsolutePath()+".temp.php");
+
+                //if currently no file is opened in current tab then open file without name as .temp.php
                 else
                 temp=new File(".temp.php");
+
+                //if opened file does not exits create new file 
             	if(!temp.exists()){
             		try{
               		temp.createNewFile();
               	}catch(Exception ex){
               	}
             	}
+            	//if file created successfully
             	if(temp!=null){
-            		temp.deleteOnExit();
+                //Delete temporary file after window closed
+            	temp.deleteOnExit();
+
+            	//Create output stream to write php code written in text Area to temporary file
 	    		try(FileOutputStream tout=new FileOutputStream(temp)){
-	    			for(char a: tb.txt.getText().toCharArray()){
+	    			// Write code file 
+	    			for(char a: curtab.txt.getText().toCharArray()){
 	    				tout.write(a);
 	    			}
+
+	    		  //get Runtime and call php program 
 	    		  Runtime r=Runtime.getRuntime();
                   Process p=r.exec("php "+temp.getAbsolutePath());
+
+                  //Get output from php program
                   InputStream stream=p.getInputStream();
                   String html="";
                   int c;
@@ -120,26 +184,36 @@ public class PHPServer extends Application{
 				         	html+=(char)c;
 				         }
 				      }while(c!=-1);
-						if(tb.opendhtml!=null)
-			            	temphtml=new File(tb.opendhtml.getAbsolutePath()+".temp.html");
+				        //if there is opened file for html open file with that file name
+						if(curtab.opendhtml!=null)
+
+			            	temphtml=new File(curtab.opendhtml.getAbsolutePath()+".temp.html");
+			            //otherwise open temp file without name as temp
 			                else
 			                temphtml=new File(".temp.html");
+			            //Open file does not exists create new
 			            if(!temphtml.exists()){
 			            		try{
 			              		temphtml.createNewFile();
 			              	}catch(Exception ex){
 			              	}
 			            	}
+
+			            //Temp html file created successfully  
 			            if(temphtml!=null){
-			            		temphtml.deleteOnExit();
+			            	//Delete when window is closed
+			            	temphtml.deleteOnExit();
+			            	//write output of php program to html file 
 				    		try(PrintWriter htmlout=new PrintWriter(new FileOutputStream(temphtml))){
 				    			String[] str=html.split("\n");
 				    			for(int i=0;i<str.length;i++){
 				    				htmlout.println(str[i]);
 				    			}
 				    		}
+
+				    // load temp html file to webview in current tab
 				    Platform.runLater(()->{
-				    	tb.engine.load(temphtml.toURI().toString());
+				    	curtab.engine.load(temphtml.toURI().toString());
 				    });
 	    			
 	    		}
@@ -152,32 +226,63 @@ public class PHPServer extends Application{
           
           }
  
-         });
-	   			
-	   			tab_pane.getTabs().add(tb);
+         };
+	    
 
-	   			tab_pane.getSelectionModel().select(tb);
+	   //Obeserve tab selection 
+	   tab_pane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>(){
+	   	public void changed(ObservableValue<? extends Tab> val,Tab old, Tab newval){
+	   		Tabbber tmpTab=(Tabbber)newval;
+	   		//Tab clicked to open new tab
+	   		if(tmpTab.TYPE==Tabbber.TYPE_OPEN_NEW){
+
+	   			//add title to new tab
+	   			curtab=new Tabbber("untitled");
+
+	   			//Add mouse listener useless till now 
+	   			curtab.txtCon.addEventHandler(MouseEvent.MOUSE_DRAGGED,(event)->{
+                     x=event.getScreenX();
+                     y=event.getScreenY();
+	            });
+
+	           //Add change listener to observe changes in Text Area
+               curtab.txt.textProperty().addListener(changeListener);
+               //Add tab to Tab pane 
+	   		   tab_pane.getTabs().add(curtab);
+	   		   //Select current tab
+               tab_pane.getSelectionModel().select(curtab);
 	   		}
-	   else{
-           curtab=(Tabbber)newval;
-           if(curtab.opend!=null)
-           System.out.println(curtab.opend.getName());
+	   	    //If One of previous tabs selected
+	         else{
+                //make selected tab current tab;
+                curtab=(Tabbber)newval;
+                if(curtab.opend!=null)
+                      System.out.println(curtab.opend.getName());
           
 	   	}
 	   }
 	   });
+
+	   //Add Scene to the stage
 	   mstg.setScene(sc);
-	    mstg.show();
-	    zoom_out.setOnAction((ae)-> {
+
+	   //Show Gui to user
+	   mstg.show();
+
+	   //Add zoom listener
+	   zoom_out.setOnAction((ae)-> {
 	    	zoom=zoom-0.1;
 	    	curtab.txt.setStyle("-fx-font-size:"+zoom+"em");
 	    	
-	     });
+	    });
 	    zoom_in.setOnAction((ae)-> {
 	    	zoom=zoom+0.1;
 	    	curtab.txt.setStyle("-fx-font-size:"+zoom+"em");
 	     });
+	    //Exit window when user choose exit menu item
 	    exit.setOnAction((ae)->System.exit(0));
+
+	    //save opened file 
 	    save.setOnAction((ae)->{
 	    	if(curtab.opend!=null){
 	    		try(FileOutputStream fout=new FileOutputStream(curtab.opend)){
@@ -204,74 +309,17 @@ public class PHPServer extends Application{
 	    	}
 	    	}
 	    });
+
+	    //Mouse drag event useless till  now -> tring to get mouse location to show context menu 
 	    curtab.txtCon.addEventHandler(MouseEvent.MOUSE_DRAGGED,(event)->{
           x=event.getScreenX();
           y=event.getScreenY();
 	    });
-            curtab.txt.textProperty().addListener( new ChangeListener<String>(){
-            @Override
-            public void changed(ObservableValue<? extends String> val,String o,String n){
-              if(curtab.counter%10==0){
-            	if(curtab.opend!=null)
-            	temp=new File(curtab.opend.getAbsolutePath()+".temp.php");
-                else
-                temp=new File(".temp.php");
-            	if(!temp.exists()){
-            		try{
-              		temp.createNewFile();
-              	}catch(Exception ex){
-              	}
-            	}
-            	if(temp!=null){
-            		temp.deleteOnExit();
-	    		try(FileOutputStream tout=new FileOutputStream(temp)){
-	    			for(char a: curtab.txt.getText().toCharArray()){
-	    				tout.write(a);
-	    			}
-	    		  Runtime r=Runtime.getRuntime();
-                  Process p=r.exec("php "+temp.getAbsolutePath());
-                  InputStream stream=p.getInputStream();
-                  String html="";
-                  int c;
-				      do{
-				         c=stream.read();
-				         if(c!=-1){
-				         	html+=(char)c;
-				         }
-				      }while(c!=-1);
-						if(curtab.opendhtml!=null)
-			            	temphtml=new File(curtab.opendhtml.getAbsolutePath()+".temp.html");
-			                else
-			                temphtml=new File(".temp.html");
-			            	if(!temphtml.exists()){
-			            		try{
-			              		temphtml.createNewFile();
-			              	}catch(Exception ex){
-			              	}
-			            	}
-			            	if(temphtml!=null){
-			            		temphtml.deleteOnExit();
-				    		try(PrintWriter htmlout=new PrintWriter(new FileOutputStream(temphtml))){
-				    			String[] str=html.split("\n");
-				    			for(int i=0;i<str.length;i++){
-				    				htmlout.println(str[i]);
-				    			}
-				    		}
-	    			Platform.runLater(()->{
-				     curtab.engine.load(temphtml.toURI().toString());
-				    });
-	    		}
-	    		}catch(Exception ex){
 
-	    		}
-	    	}
-            }else{
-	    		curtab.counter=(curtab.counter+1)%2000;
-	    	}
-         
-                 
-             }
-         });
+	    //Change listener to  observe text area
+        curtab.txt.textProperty().addListener(changeListener);
+
+        //Save as option to save file in defferent file formats 
 	    save_as.setOnAction((ae)->{
 	    	FileChooser flc=new FileChooser();
 	    	flc.setTitle("save file");
@@ -288,6 +336,8 @@ public class PHPServer extends Application{
 
 	    	}
 	    });
+
+	    //open file menu to open files
 	    opn.setOnAction((ae)->{
 	    	FileChooser flc=new FileChooser();
 	    	flc.setTitle("open file");
@@ -310,6 +360,7 @@ public class PHPServer extends Application{
 	    			System.out.print("lag gaye");
 	    		}
 	    		 System.out.println(curtab.opend.getName());
+	    	//Save temp file with new file and show in web view
              if(curtab.opendhtml!=null)
 			            	temphtml=new File(curtab.opendhtml.getAbsolutePath()+".temp.html");
 			                else
@@ -346,7 +397,12 @@ public class PHPServer extends Application{
 	
 	}
 
+   //Custom tab class 
 	private class Tabbber extends Tab{
+		final int  TAB_REGULAR=2;
+		int TYPE=TAB_REGULAR;
+		final int TAB_OPEN_NEW=1;
+		
 		HBox topcon;
 		VBox webcon;
 		VBox txtCon;
@@ -357,7 +413,7 @@ public class PHPServer extends Application{
 		File opendhtml=null;
 	    double x;
 		double y;
-		int counter=0;
+
 		public Tabbber(String str){
         this.setText(str);
         topcon=new HBox();
