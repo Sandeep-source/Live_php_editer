@@ -3,7 +3,7 @@
  This Editer 🖊 is created with the help of java ☕. It presents the use of simple java IO ✍ to make some creative Apps. Basic understanding of java and javafx is enough to customize 🛠 this accourding to your needs.
  
 ## Requirements
-- JDK 9 ☕ or any JDK with javafx lib (Some changes in import code section is needed in order to use openfx)
+- JDK 9 ☕ or any JDK with openfx lib (Some changes in import code section is needed in order to use openfx)
 - Php 
  
 ## Feature
@@ -40,6 +40,14 @@ Let's take a look at the process behind the the seen.
 Note:- If the source file📝 is used instead of new file then at the end when user press `Ctrl+S` or choose save from menu
 the current state of file in saved to source file. As is should be.
 
+# Ruuning Application
+
+Just run ▶ the PHPServer.java as normal java program and You will be all set to use this lightweight app.
+
+```
+javac PHPServer.java
+java PHPServer
+```
 
 ## Screenshot 
 
@@ -47,5 +55,6 @@ the current state of file in saved to source file. As is should be.
 
 
 ## What can be improved
+
 - Syntax  highlighting
 - Links 🔗 opening behaivour, Mainly for `target="_blank"`
