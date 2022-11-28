@@ -33,12 +33,12 @@ So how all this works ? So answer is very simple, just using java IO ✍. There 
 When user type Php code 👨‍💻 into TextArea the corresponding result is shown in the WebView components.
 Let's take a look at the process behind the the seen.
 1. The code written by the user is fetched by the application and written to a temporary php file 📝 after every keystroke.
-2. The generated file📝 then executed⚙ by the php program to generate equaivalent html code which is saved to another temporary file📝.
-3. The generated Html response file by php code is loaded into WebView.
+2. The generated temporary php file📝 then executed⚙ by the php program to generate equaivalent html code which is saved to another temporary html file📝.
+3. The generated temporary Html response file 📝 by php code is loaded into WebView.
 4. That's all 🎯.
 
-Note:- If the source file📝 is used instead of new file then at the end when user press `Ctrl+S` or choose save from menu
-the current state of file in saved to source file. As is should be.
+Note:- If the local file 📝 is opend instead of creating new file then at the end when user press `Ctrl+S` or choose save from menu
+the current state of file in saved to opened local file. As it should be.
 
 # Ruuning Application
 
